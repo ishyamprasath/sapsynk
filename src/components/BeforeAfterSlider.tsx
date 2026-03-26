@@ -17,22 +17,7 @@ function AnimatedNumber({ value, color }: { value: number; color: string }) {
   );
 }
 
-/* ─── Before app tiles ──────────────────────────────────────── */
-const APPS = [
-  { emoji: '📧', label: 'Gmail' },
-  { emoji: '📊', label: 'Sheets' },
-  { emoji: '📝', label: 'Docs' },
-  { emoji: '🗓', label: 'Calendar' },
-  { emoji: '⏰', label: 'Reminders' },
-  { emoji: '📋', label: 'Tasks' },
-];
-
-/* ─── After workflow steps ───────────────────────────────────── */
-const STEPS = [
-  { icon: '📥', label: 'Trigger', color: '#22C55E' },
-  { icon: '🤖', label: 'AI Core', color: '#8B5CF6' },
-  { icon: '🚀', label: 'Deploy', color: '#22C55E' },
-];
+/* ─── Shared UI Utils ───────────────────────────────────────── */
 
 export default function BeforeAfterSlider() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,9 +36,10 @@ export default function BeforeAfterSlider() {
   const [pct, setPct] = useState(50);
   useEffect(() => springPct.on('change', setPct), [springPct]);
 
-  /* Hours: before decreases left→right, after increases left→right */
-  const beforeHours = Math.round(47 - (pct / 100) * 45);   // 47 → 2
-  const afterHours  = Math.max(1, Math.round(47 - beforeHours));
+  /* Hours: Automation increases as handle moves LEFT (pct -> 0) */
+  const automationRatio = (100 - pct) / 100; // 1.0 when full green, 0.0 when full red
+  const manualHours = Math.round(47 - (automationRatio * 45)); // 47 -> 2
+  const savedHours = Math.round(automationRatio * 45);         // 0 -> 45
 
   /* Pointer drag */
   const commit = useCallback((clientX: number) => {
@@ -109,9 +95,9 @@ export default function BeforeAfterSlider() {
         {/* Stats row — pinned to left and right */}
         <div className="flex items-end justify-between mb-5 px-1">
           <div className="flex flex-col gap-1">
-            <AnimatedNumber value={beforeHours} color="#EF4444" />
+            <AnimatedNumber value={manualHours} color="#EF4444" />
             <span className="text-[#EF4444]/50 text-[10px] font-[family-name:var(--font-mono)] tracking-widest uppercase">
-              hrs/wk · without AI
+              Manual Hours/wk
             </span>
           </div>
 
@@ -124,9 +110,9 @@ export default function BeforeAfterSlider() {
           </motion.div>
 
           <div className="flex flex-col gap-1 items-end">
-            <AnimatedNumber value={afterHours} color="#22C55E" />
+            <AnimatedNumber value={savedHours} color="#22C55E" />
             <span className="text-[#22C55E]/50 text-[10px] font-[family-name:var(--font-mono)] tracking-widest uppercase">
-              hrs/wk · with SapSynk
+              Hours Saved/wk
             </span>
           </div>
         </div>
@@ -157,51 +143,68 @@ export default function BeforeAfterSlider() {
               backgroundSize: '36px 36px',
             }} />
 
-            {/*
-              ✅ KEY FIX: content pinned to LEFT QUARTER so it never overlaps "after" content.
-              Using absolute positioning at 25% of width.
-            */}
+            {/* Centered Before content */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center"
-              style={{ left: '12%', width: '38%' }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col w-full max-w-3xl items-center px-4"
             >
-              {/* Emoji + label */}
-              <motion.div
-                className="text-6xl mb-5"
-                animate={{ rotate: [-4, 4, -4], y: [0, -4, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                😩
-              </motion.div>
-              <p className="text-[#EF4444] font-[family-name:var(--font-heading)] text-lg font-bold mb-5 text-center">
-                Before Automation
+              <p className="text-[#EF4444] font-[family-name:var(--font-heading)] text-lg font-bold mb-6">
+                Manual Operations
               </p>
 
-              {/* App chaos grid */}
-              <div className="grid grid-cols-3 gap-2.5 mb-5">
-                {APPS.map(({ emoji, label }, i) => (
-                  <motion.div
-                    key={label}
-                    animate={{ rotate: [i % 2 === 0 ? -3 : 3, i % 2 === 0 ? 3 : -3, i % 2 === 0 ? -3 : 3], y: [0, -4, 0] }}
-                    transition={{ duration: 2.2 + i * 0.35, repeat: Infinity, delay: i * 0.2, ease: 'easeInOut' }}
-                    className="w-14 h-14 rounded-xl flex flex-col items-center justify-center border gap-0.5"
-                    style={{ background: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.25)' }}
-                  >
-                    <span className="text-xl">{emoji}</span>
-                    <span className="text-[7px] text-[#EF4444]/60 font-[family-name:var(--font-mono)]">{label}</span>
-                  </motion.div>
-                ))}
-              </div>
+              <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 md:gap-8 w-full">
+                
+                {/* Left: Unstructured Messy Email */}
+                <div className="w-full md:w-5/12 rounded-lg border border-red-500/20 bg-black/60 backdrop-blur-md p-4 relative font-mono text-xs text-[#F5F0E8]/70 flex flex-col">
+                  <div className="flex items-center gap-2 mb-3 border-b border-red-500/10 pb-2 shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                    <span className="text-[#EF4444]/60 uppercase tracking-wider text-[9px]">Unstructured Request</span>
+                  </div>
+                  <p className="leading-relaxed flex-1">
+                    Hey team, <br/><br/>
+                    Please update the CRM. <span className="bg-red-500/20 text-[#EF4444] px-1 rounded border border-red-500/30">ACME Corp</span> needs their billing changed to <span className="bg-red-500/20 text-[#EF4444] px-1 rounded border border-red-500/30">Net60</span>. Also, their new shipping address is <span className="bg-red-500/20 text-[#EF4444] px-1 rounded border border-red-500/30">123 Main St</span>.
+                    <br/><br/>Thanks!
+                  </p>
+                </div>
 
-              <p className="text-[#EF4444]/40 text-[10px] font-[family-name:var(--font-mono)] tracking-widest text-center">
-                MANUAL · REPETITIVE · ERROR-PRONE
+                {/* Middle: Human Bottleneck */}
+                <div className="flex flex-col items-center justify-center relative w-full md:w-auto my-2 md:my-0">
+                   <div className="h-8 md:h-full w-px md:w-[1px] bg-dashed border-l border-red-500/30 border-dashed absolute top-0 bottom-0 left-1/2 md:-left-4 md:right-auto md:top-0 -z-10 hidden md:block" />
+                   <div className="px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/30 flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.15)] backdrop-blur-sm">
+                     <div className="w-1.5 h-1.5 rounded-full bg-red-500 border border-red-400 animate-pulse" />
+                     <span className="text-[9px] font-mono text-red-500 tracking-widest uppercase">Manual Entry</span>
+                   </div>
+                </div>
+
+                {/* Right: Empty Database Form */}
+                <div className="w-full md:w-5/12 rounded-lg border border-red-500/20 bg-black/60 backdrop-blur-md p-4 relative font-mono text-[10px] flex flex-col">
+                  <div className="flex items-center gap-2 mb-3 border-b border-red-500/10 pb-2 shrink-0">
+                    <svg className="w-3 h-3 text-red-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                    <span className="text-[#EF4444]/60 uppercase tracking-wider text-[9px]">Target CRM System</span>
+                  </div>
+                  <div className="space-y-4 text-[#F5F0E8]/40 flex-1">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-1">
+                      <span>Account Name:</span> <span className="text-red-500/50 italic mr-2">- Empty -</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-white/5 pb-1">
+                      <span>Billing Terms:</span> <span className="text-red-500/50 italic mr-2">- Empty -</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b border-white/5 pb-1">
+                      <span>Shipping Addr:</span> <span className="text-red-500/50 italic mr-2">- Empty -</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              
+              <p className="text-[#EF4444]/40 text-[10px] font-mono tracking-widest mt-6 uppercase text-center w-full">
+                Fragmented Data • Human Error • High Latency
               </p>
             </div>
 
             {/* Badge */}
             <div className="absolute top-5 left-5 px-3 py-1.5 rounded-full text-[10px] font-[family-name:var(--font-mono)] tracking-widest uppercase"
                  style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)' }}>
-              Without AI
+              Without Sync
             </div>
           </div>
 
@@ -219,90 +222,111 @@ export default function BeforeAfterSlider() {
               backgroundSize: '36px 36px',
             }} />
 
-            {/*
-              ✅ KEY FIX: content pinned to RIGHT QUARTER so it never overlaps "before" content.
-            */}
+            {/* Centered After content */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 flex flex-col items-center"
-              style={{ right: '12%', width: '38%' }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col w-full max-w-3xl items-center px-4"
             >
-              {/* Happy emoji */}
-              <motion.div
-                className="text-6xl mb-5"
-                animate={{ scale: [1, 1.08, 1], rotate: [-2, 2, -2] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                😎
-              </motion.div>
-              <p className="text-[#22C55E] font-[family-name:var(--font-heading)] text-lg font-bold mb-5 text-center">
-                With SapSynk AI
-              </p>
+              <div className="flex items-center justify-between w-full max-w-[690px] mb-6">
+                <p className="text-[#22C55E] font-[family-name:var(--font-heading)] text-lg font-bold drop-shadow-[0_0_8px_rgba(34,197,94,0.3)]">
+                  SapSynk Automation
+                </p>
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] animate-pulse" />
+                  <span className="text-[9px] font-mono text-[#22C55E] tracking-widest uppercase hidden sm:inline">Live • Synchronized</span>
+                </div>
+              </div>
 
-              {/* Workflow mini-graph */}
-              <svg width="240" height="160" viewBox="0 0 240 160" className="mb-4">
-                <defs>
-                  <filter id="gGlow" x="-60%" y="-60%" width="220%" height="220%">
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
+              <div className="flex flex-col md:flex-row items-stretch justify-center gap-4 md:gap-8 w-full relative">
+                
+                {/* Horizontal data traces connecting left to right */}
+                <div className="hidden md:block absolute top-1/2 left-1/4 right-1/4 h-[1px] bg-[rgba(180,155,255,0.15)] -z-10 overflow-hidden">
+                   <motion.div 
+                     className="h-full bg-gradient-to-r from-transparent via-[#b49bff] to-transparent w-full"
+                     animate={{ x: ['-100%', '100%'] }}
+                     transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                   />
+                </div>
 
-                {/* Edges */}
-                {[
-                  { x1: 50, y1: 80, x2: 120, y2: 80 },
-                  { x1: 168, y1: 80, x2: 200, y2: 48 },
-                  { x1: 168, y1: 80, x2: 200, y2: 80 },
-                  { x1: 168, y1: 80, x2: 200, y2: 112 },
-                ].map((e, i) => (
-                  <g key={i}>
-                    <line x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
-                          stroke="rgba(34,197,94,0.2)" strokeWidth="1.5" />
-                    <line x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
-                          stroke="#22C55E" strokeWidth="2" strokeDasharray="7 16" strokeOpacity="0.7">
-                      <animate attributeName="stroke-dashoffset" from="23" to="0"
-                               dur={`${1 + i * 0.2}s`} repeatCount="indefinite" />
-                    </line>
-                    <circle r="4" fill="#22C55E" filter="url(#gGlow)">
-                      <animateMotion dur={`${1.2 + i * 0.3}s`} begin={`${i * 0.35}s`}
-                                     repeatCount="indefinite" path={`M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`} />
-                    </circle>
-                  </g>
-                ))}
+                {/* Left: Unstructured Messy Email (Scanned) */}
+                <div className="w-full md:w-5/12 rounded-lg border border-[rgba(180,155,255,0.3)] bg-black/40 backdrop-blur-md p-4 relative font-mono text-xs text-[#F5F0E8]/70 shadow-[0_0_20px_rgba(180,155,255,0.05)] flex flex-col">
+                  {/* Subtle scanning laser graphic */}
+                  <div className="absolute top-0 left-0 w-full h-[1px] bg-[rgba(180,155,255,0.5)]">
+                    <motion.div className="h-full bg-white shadow-[0_0_8px_#fff] w-1/4" animate={{ x: ['-100%', '400%'] }} transition={{ duration: 2.2, repeat: Infinity, ease: 'linear' }} />
+                  </div>
+                  
+                  <div className="flex items-center justify-between gap-2 mb-3 border-b border-[rgba(180,155,255,0.2)] pb-2 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#b49bff] shadow-[0_0_10px_#b49bff]" />
+                      <span className="text-[#b49bff]/80 uppercase tracking-wider text-[9px]">Ingesting Source</span>
+                    </div>
+                    <span className="text-[#22C55E] text-[9px] uppercase tracking-widest flex items-center gap-1 font-bold">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg> Read
+                    </span>
+                  </div>
+                  <p className="leading-relaxed relative group flex-1">
+                    Hey team, <br/><br/>
+                    Please update the CRM. <span className="bg-[#b49bff]/20 text-[#b49bff] px-1 rounded shadow-[0_0_8px_rgba(180,155,255,0.3)] font-semibold border border-[#b49bff]/40">ACME Corp</span> needs their billing changed to <span className="bg-[#b49bff]/20 text-[#b49bff] px-1 rounded shadow-[0_0_8px_rgba(180,155,255,0.3)] font-semibold border border-[#b49bff]/40">Net60</span>. Also, their new shipping address is <span className="bg-[#b49bff]/20 text-[#b49bff] px-1 rounded shadow-[0_0_8px_rgba(180,155,255,0.3)] font-semibold border border-[#b49bff]/40">123 Main St</span>.
+                    <br/><br/>Thanks!
+                  </p>
+                </div>
 
-                {/* Trigger node */}
-                <rect x={5} y={62} width={68} height={36} rx={8}
-                      fill="rgba(34,197,94,0.1)" stroke="rgba(34,197,94,0.4)" strokeWidth="1.2" />
-                <text x={39} y={81} textAnchor="middle" fontSize="9" fill="#22C55E" fontFamily="monospace">Trigger</text>
-                <text x={39} y={93} textAnchor="middle" fontSize="8" fill="rgba(34,197,94,0.55)" fontFamily="monospace">Event</text>
+                {/* Middle: SapSynk Neural Engine */}
+                <div className="flex flex-col items-center justify-center relative w-full md:w-auto my-2 md:my-0 z-10 transition-transform duration-300 hover:scale-105 cursor-default">
+                   <div className="px-5 py-3 rounded-xl bg-[#011a07] border border-[#b49bff] flex flex-col items-center gap-1 shadow-[0_0_30px_rgba(180,155,255,0.2)] backdrop-blur-md relative overflow-hidden">
+                     <motion.div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[rgba(180,155,255,0.15)] to-transparent"
+                       animate={{ x: ['-200%', '200%'] }}
+                       transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                     />
+                     <span className="text-[15px] font-[family-name:var(--font-heading)] font-bold text-[#b49bff] tracking-wide relative z-10">SapSynk Engine</span>
+                     <span className="text-[7.5px] font-mono text-[#F5F0E8]/70 tracking-[0.2em] uppercase relative z-10">Semantic Neural Router</span>
+                   </div>
+                </div>
 
-                {/* AI Core */}
-                <circle cx={144} cy={80} r={24} fill="rgba(34,197,94,0.12)" stroke="#22C55E" strokeWidth="1.5">
-                  <animate attributeName="r" values="24;28;24" dur="2.2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="1;0.5;1" dur="2.2s" repeatCount="indefinite" />
-                </circle>
-                <circle cx={144} cy={80} r={18} fill="rgba(34,197,94,0.15)" stroke="#22C55E" strokeWidth="1.2" />
-                <text x={144} y={77} textAnchor="middle" fontSize="10" fill="#22C55E" fontFamily="monospace" fontWeight="700">AI</text>
-                <text x={144} y={89} textAnchor="middle" fontSize="7" fill="rgba(34,197,94,0.6)" fontFamily="monospace">Core</text>
+                {/* Right: Perfect Structured JSON Payload */}
+                <div className="w-full md:w-5/12 rounded-lg border border-green-500/30 bg-black/40 backdrop-blur-md p-4 relative font-mono text-[10px] shadow-[0_0_20px_rgba(34,197,94,0.08)] flex flex-col">
+                  <div className="absolute top-0 right-0 w-full h-[1px] bg-[rgba(34,197,94,0.4)]">
+                    <motion.div className="h-full bg-white shadow-[0_0_8px_#fff] w-1/4" animate={{ x: ['400%', '-100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }} />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 mb-3 border-b border-green-500/20 pb-2 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                      <span className="text-[#22C55E]/80 uppercase tracking-wider text-[9px]">Structured Payload</span>
+                    </div>
+                    <span className="text-[#22C55E] text-[9px] uppercase tracking-widest flex items-center gap-1 font-bold">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg> Synced
+                    </span>
+                  </div>
+                  <div className="text-[12px] sm:text-[13px] text-[#F5F0E8]/90 overflow-x-auto whitespace-pre leading-relaxed m-0 opacity-95 flex-1 relative font-[family-name:var(--font-mono)]">
+                    <span className="text-[#F472B6]">{"{"}</span>{"\n"}
+                    {"  "}<span className="text-[#93C5FD]">"accountName"</span><span className="text-[#F5F0E8]/50">:</span> <span className="text-[#86EFAC]">"ACME Corp"</span><span className="text-[#F5F0E8]/50">,</span>{"\n"}
+                    {"  "}<span className="text-[#93C5FD]">"billingTerms"</span><span className="text-[#F5F0E8]/50">:</span> <span className="text-[#86EFAC]">"Net60"</span><span className="text-[#F5F0E8]/50">,</span>{"\n"}
+                    {"  "}<span className="text-[#93C5FD]">"shippingAddr"</span><span className="text-[#F5F0E8]/50">:</span> <span className="text-[#86EFAC]">"123 Main St"</span>{"\n"}
+                    <span className="text-[#F472B6]">{"}"}</span>
+                  </div>
+                </div>
 
-                {/* Outputs */}
-                {(['Notify', 'CRM', 'Book']).map((lbl, i) => (
-                  <g key={lbl}>
-                    <rect x={195} y={34 + i * 32} width={40} height={22} rx={6}
-                          fill="rgba(34,197,94,0.09)" stroke="rgba(34,197,94,0.35)" strokeWidth="1" />
-                    <text x={215} y={49 + i * 32} textAnchor="middle" fontSize="8" fill="#22C55E" fontFamily="monospace">{lbl}</text>
-                  </g>
-                ))}
-              </svg>
-
-              <p className="text-[#22C55E]/40 text-[10px] font-[family-name:var(--font-mono)] tracking-widest text-center">
-                AUTOMATED · INSTANT · ZERO ERRORS
-              </p>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-8 mt-6 w-full max-w-[500px] text-center border-t border-[rgba(34,197,94,0.15)] pt-5">
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-mono text-[#22C55E]/50 tracking-[0.2em] uppercase">Data Accuracy</span>
+                  <span className="font-mono text-sm sm:text-base text-[#22C55E] font-bold mt-1">100%</span>
+                </div>
+                <div className="flex flex-col border-l border-r border-[#22C55E]/20">
+                  <span className="text-[9px] font-mono text-[#22C55E]/50 tracking-[0.2em] uppercase">Latency</span>
+                  <span className="font-mono text-sm sm:text-base text-[#22C55E] font-bold mt-1">12ms</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-mono text-[#22C55E]/50 tracking-[0.2em] uppercase">Manual Touches</span>
+                  <span className="font-mono text-sm sm:text-base text-[#22C55E] font-bold mt-1">0</span>
+                </div>
+              </div>
             </div>
 
             {/* Badge */}
             <div className="absolute top-5 right-5 px-3 py-1.5 rounded-full text-[10px] font-[family-name:var(--font-mono)] tracking-widest uppercase"
-                 style={{ background: 'rgba(34,197,94,0.12)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.3)' }}>
-              With SapSynk
+                 style={{ offsetPath: 'none', background: 'rgba(34,197,94,0.12)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.3)' }}>
+              SapSynk Unified
             </div>
           </motion.div>
 
