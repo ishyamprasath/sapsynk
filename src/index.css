@@ -1,17 +1,303 @@
-@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ==========================================
+   DESIGN TOKENS
+   ========================================== */
 @theme {
-  --color-background: #f8fafc;
+  --color-background: #030014;
+  --color-surface: #0a0a2a;
+  --color-surface-2: #151540;
+  --color-border: rgba(255,255,255,0.08);
+  --color-border-bright: rgba(0,255,240,0.25);
+  --color-cyan: #00FFF0;
+  --color-cyan-dim: rgba(0,255,240,0.15);
+  --color-cyan-glow: rgba(0,255,240,0.4);
+  --color-text: #F5F0E8;
+  --color-text-muted: rgba(245,240,232,0.5);
+  --color-text-dim: rgba(245,240,232,0.2);
+  --color-purple: #8B5CF6;
+  --color-orange: #F97316;
+  --color-green: #22C55E;
+  --color-red: #EF4444;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
 }
 
-body {
-  background-color: var(--color-background);
-  color: #0f172a;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+/* ==========================================
+   BASE STYLES
+   ========================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
+
 
 html {
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: #030014;
+  color: #F5F0E8;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(0,255,240,0.2);
+  color: #00FFF0;
+}
+
+
+/* ==========================================
+   INTEGRATION RAIL MARQUEE
+   ========================================== */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+.marquee-left {
+  animation: marquee-left 30s linear infinite;
+}
+
+.marquee-right {
+  animation: marquee-right 30s linear infinite;
+}
+
+.marquee-left:hover,
+.marquee-right:hover {
+  animation-play-state: paused;
+}
+
+/* ==========================================
+   TERMINAL CURSOR BLINK
+   ========================================== */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  background: #00FFF0;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+
+/* ==========================================
+   GLASSMORPHISM UTILITY
+   ========================================== */
+.glass {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.glass-cyan {
+  background: rgba(0,255,240,0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0,255,240,0.15);
+}
+
+/* ==========================================
+   GRID PATTERN BACKGROUND
+   ========================================== */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ==========================================
+   GLOW EFFECTS
+   ========================================== */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0,255,240,0.3), 0 0 60px rgba(0,255,240,0.1);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0,255,240,0.5);
+}
+
+/* ==========================================
+   TEAM CARD FLIP
+   ========================================== */
+.team-card-wrapper {
+  perspective: 1000px;
+}
+
+.team-card-inner {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.team-card-wrapper:hover .team-card-inner {
+  transform: rotateY(180deg);
+}
+
+.team-card-front,
+.team-card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.team-card-back {
+  transform: rotateY(180deg);
+  position: absolute;
+  inset: 0;
+}
+
+/* ==========================================
+   WORKFLOW BUILDER SVG PATHS
+   ========================================== */
+@keyframes flow-pulse {
+  0% { stroke-dashoffset: 100; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+.flow-edge-animated {
+  stroke-dasharray: 8 4;
+  animation: flow-pulse 2s ease-in-out infinite;
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-left, .marquee-right {
+    animation: none;
+  }
+  .terminal-cursor {
+    animation: none;
+  }
+  .team-card-wrapper:hover .team-card-inner {
+    transform: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   SCROLLBAR DARK THEME
+   ========================================== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #030014;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0,255,240,0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,255,240,0.4);
+}
+
+/* ==========================================
+   FLOATING PILL ANIMATION
+   ========================================== */
+@keyframes float-bounce {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.floating-pill {
+  animation: float-bounce 2.5s ease-in-out infinite;
+}
+
+/* Number ticker big font */
+.ticker-number {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  color: #F5F0E8;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Live pulse dot */
+@keyframes live-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #22C55E;
+  border-radius: 50%;
+  animation: live-pulse 1.5s ease-in-out infinite;
+}
+
+/* ==========================================
+   SPACE THEME UTILITIES
+   ========================================== */
+.cursive {
+  font-family: "Cedarville Cursive", cursive;
+}
+.Welcome-text {
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.4)
+    ),
+    linear-gradient(90.01deg, #e59cff 0.01%, #ba9cff 50.01%, #9cb2ff 100%);
+  background-blend-mode: normal, screen;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.Welcome-box {
+  isolation: isolate;
+  overflow: hidden;
+  align-items: center;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border-radius: 32px;
+  box-shadow: inset 0 -7px 11px #a48fff1f;
+  display: flex;
+
+  position: relative;
+  width: -moz-max-content;
+  width: max-content;
+  transition: 0.45s cubic-bezier(0.6, 0.6, 0, 1) box-shadow;
+}
+
+.button-primary {
+  background: linear-gradient(
+      180deg,
+      rgba(60, 8, 126, 0) 0%,
+      rgba(60, 8, 126, 0.32) 100%
+    ),
+    rgba(113, 47, 255, 0.12);
+  box-shadow: inset 0 0 12px #bf97ff3d;
+}
+.button-primary:hover {
+  background: linear-gradient(
+      180deg,
+      rgba(60, 8, 126, 0) 0%,
+      rgba(60, 8, 126, 0.42) 100%
+    ),
+    rgba(113, 47, 255, 0.24);
+  box-shadow: inset 0 0 12px #bf97ff70;
 }
