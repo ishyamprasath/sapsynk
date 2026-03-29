@@ -230,7 +230,7 @@ export default function ROITicker() {
         
         {/* Header Header */}
         <motion.div 
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -246,14 +246,14 @@ export default function ROITicker() {
               <span className="text-white/40">Real-time telemetry</span>
             </h2>
           </div>
-          <div className="flex gap-12 border-l border-white/5 pl-12 h-fit">
+          <div className="flex gap-8 md:gap-12 border-t md:border-t-0 md:border-l border-white/5 pt-6 md:pt-0 md:pl-12 h-fit w-full md:w-auto">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest font-bold">Network Uptime</span>
-              <span className="text-2xl font-black text-[#22C55E]">99.999%</span>
+              <span className="text-2xl md:text-3xl font-black text-[#22C55E]">99.999%</span>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-full text-right md:text-left">
               <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest font-bold">Global ROI</span>
-              <span className="text-2xl font-black text-white">847% <span className="text-[#22C55E] text-sm tracking-tighter">↗ 12%</span></span>
+              <span className="text-2xl md:text-3xl font-black text-white">847% <span className="text-[#22C55E] text-xs md:text-sm tracking-tighter">↗ 12%</span></span>
             </div>
           </div>
         </motion.div>

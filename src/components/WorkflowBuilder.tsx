@@ -89,7 +89,7 @@ const NeuralCore = ({ activeFlow, status, activeCoreStep }: any) => {
   const colorClass = activeFlow ? activeFlow.color : 'from-indigo-500/20 to-purple-500/20';
   
   return (
-    <div className="relative w-full h-[500px] flex items-center justify-center perspective-[1200px]">
+    <div className="relative w-full h-[350px] md:h-[500px] flex items-center justify-center perspective-[1200px] scale-75 md:scale-100 origin-center">
       {/* Cinematic 3D Rotators */}
       <motion.div 
         animate={{ rotateX: [60, 60], rotateZ: [0, 360] }}
@@ -225,7 +225,7 @@ export default function CinematicWorkflow() {
                initial={{ opacity: 0, scale: 0.8 }}
                animate={{ opacity: 1, scale: 1 }}
                exit={{ opacity: 0 }}
-               duration={1}
+               transition={{ duration: 1 }}
                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200vw] h-[200px] bg-gradient-to-r from-transparent via-${activeFlow.color.split(' ')[0].replace('from-', '')}/10 to-transparent blur-3xl -rotate-12`}
             />
          )}
@@ -251,10 +251,10 @@ export default function CinematicWorkflow() {
         </div>
 
         {/* ─── HOLOGRAPHIC 3-COLUMN THEATER ─── */}
-        <div className="relative w-full aspect-[21/9] min-h-[600px] flex items-center justify-between">
+        <div className="relative w-full lg:aspect-[21/9] min-h-[600px] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-0">
             
-            {/* SVG Laser Grid Map (Background connections) */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))' }}>
+            {/* SVG Laser Grid Map (Background connections) - Hidden on mobile */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 hidden lg:block" style={{ filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))' }}>
                {/* Pre-calculate positions: 5 triggers evenly spaced natively by flex, outputs too. 
                    We draw soft bezier curves representing idle state fibers. */}
                {Array.from({length: 5}).map((_, i) => {
@@ -302,7 +302,7 @@ export default function CinematicWorkflow() {
             </svg>
 
             {/* Col 1: Triggers */}
-            <div className="w-[20%] h-full flex flex-col justify-between py-8 relative z-10 perspective-[800px]">
+            <div className="w-full lg:w-[20%] flex flex-col gap-4 lg:justify-between lg:py-8 lg:h-full relative z-10 perspective-[800px] order-1 lg:order-none">
                {FLOWS.map((flow, i) => {
                   const isActive = activeId === flow.id;
                   const isDimmed = status !== 'idle' && !isActive;
@@ -315,7 +315,7 @@ export default function CinematicWorkflow() {
                        whileTap={{ scale: 0.95 }}
                        className={`w-full text-left relative group rounded-2xl border transition-all duration-500 overflow-hidden backdrop-blur-xl
                          ${isActive ? 'border-transparent shadow-[0_0_40px_rgba(255,255,255,0.2)] bg-white/10' : 'border-white/10 bg-[#090514]/60 hover:bg-white/5 hover:border-white/20'}
-                         ${isDimmed ? 'opacity-20 blur-[2px]' : 'opacity-100'}
+                         ${isDimmed ? 'opacity-30 lg:opacity-20 blur-[1px]' : 'opacity-100'}
                        `}
                        style={{ transformStyle: 'preserve-3d' }}
                     >
@@ -323,7 +323,7 @@ export default function CinematicWorkflow() {
                          <div className={`absolute inset-0 bg-gradient-to-r ${flow.color} opacity-20 pointer-events-none`} />
                        )}
                        <div className="p-4 flex items-center gap-4 relative z-10">
-                          <div className={`w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center shadow-inner transition-colors ${isActive ? `bg-gradient-to-br ${flow.color} border-transparent text-white` : 'bg-white/5 text-white/50 group-hover:text-white'}`}>
+                          <div className={`w-12 h-12 rounded-xl border border-white/10 flex items-center justify-center shadow-inner transition-colors shrink-0 ${isActive ? `bg-gradient-to-br ${flow.color} border-transparent text-white` : 'bg-white/5 text-white/50 group-hover:text-white'}`}>
                             <flow.trigger.icon className="w-5 h-5" />
                           </div>
                           <div>
@@ -337,12 +337,12 @@ export default function CinematicWorkflow() {
             </div>
 
             {/* Col 2: Neural Core Screen */}
-            <div className="w-[40%] flex items-center justify-center relative z-20 pointer-events-none">
+            <div className="w-full lg:w-[40%] flex items-center justify-center relative z-20 pointer-events-none order-2 lg:order-none -my-12 lg:my-0">
                <NeuralCore activeFlow={activeFlow} status={status} activeCoreStep={activeCoreStep} />
             </div>
 
             {/* Col 3: Outputs */}
-            <div className="w-[20%] h-full flex flex-col justify-between py-8 relative z-10 perspective-[800px]">
+            <div className="w-full lg:w-[20%] flex flex-col gap-4 lg:justify-between lg:py-8 lg:h-full relative z-10 perspective-[800px] order-3 lg:order-none">
                {ALL_OUTPUTS.map((output, i) => {
                   const isOutputting = status === 'outputting';
                   const isActiveOutput = isOutputting && activeFlow?.outputs.includes(output.id);
