@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { useState, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ServicePanel from './ServicePanel';
 import VideoModal from './VideoModal';
 
@@ -43,7 +44,7 @@ function ChatDemo() {
       {messages.map((msg, i) => (
         <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
           <div
-            className="max-w-[80%] px-4 py-2, rounded-2xl text-sm"
+            className="max-w-[80%] px-4 py-2 rounded-2xl text-sm"
             style={{
               background: msg.role === 'ai' ? 'rgba(180, 155, 255,0.08)' : 'rgba(139,92,246,0.15)',
               color: msg.role === 'ai' ? '#b49bff' : '#F5F0E8',
@@ -269,35 +270,173 @@ const services = [
 
 export default function Services() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  
+  // Angle tracked continuously to allow infinite spinning
+  const [rotationAngle, setRotationAngle] = useState(0);
+
+  // We have 9 services, so theta = 360 / 9 = 40 degrees
+  const anglePerCard = 360 / services.length;
+  
+  // Calculate the active index dynamically based on cumulative rotation
+  const activeIndex = Math.round(-rotationAngle / anglePerCard) % services.length;
+  // Handle javascript negative modulo edge cases safely to pinpoint exact active index
+  const normalizedActiveIndex = (activeIndex + services.length) % services.length;
+
+  // Render variables
+  const getRadius = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return 320; // smaller radius on mobile
+    }
+    return 600; // Large wide carousel on desktop
+  };
+  const [radius, setRadius] = useState(600);
+  
+  useEffect(() => {
+    const handleResize = () => setRadius(getRadius());
+    handleResize(); // trigger on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Optional: Auto-rotate carousel when modal is closed
+  useEffect(() => {
+    if (openIdx !== null) return;
+    const interval = setInterval(() => {
+      setRotationAngle((prev) => prev - anglePerCard);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [openIdx, anglePerCard]);
 
   return (
-    <section id="services" className="py-28 relative border-t border-white/5 overflow-hidden">
-      <div className="mb-14 px-6 max-w-7xl mx-auto">
+    <section id="services" className="py-32 relative border-t border-white/5 bg-[#030014] overflow-hidden">
+      
+      {/* Dynamic ambient glowing light mapping to the active center card */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.12] blur-[150px] transition-colors duration-1000 pointer-events-none"
+        style={{ backgroundColor: services[normalizedActiveIndex].color }}
+      />
+
+      <div className="mb-20 px-6 max-w-7xl mx-auto relative z-10">
         <div className="text-center">
-          <p className="text-xs font-[family-name:var(--font-mono)] tracking-[0.3em] uppercase text-[#F5F0E8]/30 mb-3">
+          <p className="text-xs font-[family-name:var(--font-mono)] tracking-[0.3em] uppercase mb-4" style={{ color: services[normalizedActiveIndex].color, transition: 'color 1s ease' }}>
             What We Build
           </p>
-          <h2 className="text-4xl md:text-5xl font-[family-name:var(--font-heading)] font-bold text-[#F5F0E8]">
+          <h2 className="text-5xl md:text-6xl font-[family-name:var(--font-heading)] font-bold text-white tracking-tight">
             Services that{' '}
-            <span className="text-[#b49bff]">prove themselves</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#b49bff] to-[#8B5CF6]">prove themselves</span>
           </h2>
-          <p className="text-[#F5F0E8]/40 mt-4 text-sm">Click any card to see a live demo</p>
+          <p className="text-white/50 mt-6 text-sm max-w-xl mx-auto">
+            Interact with our 3D cycle below.
+          </p>
         </div>
       </div>
 
-      {/* Horizontal scroll panels */}
-      <div className="flex gap-6 overflow-x-auto px-6 pb-6 scrollbar-thin snap-x snap-mandatory">
-        {services.map((svc, i) => (
-          <div key={i} className="snap-start shrink-0">
-            <ServicePanel
-              {...svc}
-              onOpen={() => setOpenIdx(i)}
+      {/* 3D Circular Cylinder Carousel Container */}
+      <div className="relative w-full h-[600px] md:h-[550px] flex items-center justify-center perspective-[2000px] overflow-hidden md:overflow-visible">
+        
+        {/* Carousel Click Controls overlayed on sides */}
+        <div className="absolute top-1/2 -translate-y-1/2 w-full max-w-7xl px-4 md:px-12 flex justify-between z-50 pointer-events-none">
+          <button 
+            onClick={() => setRotationAngle(r => r + anglePerCard)} 
+            className="pointer-events-auto p-4 md:p-5 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:scale-110 backdrop-blur-2xl text-white/70 hover:text-white transition-all shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+          >
+            <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
+          </button>
+          <button 
+            onClick={() => setRotationAngle(r => r - anglePerCard)} 
+            className="pointer-events-auto p-4 md:p-5 rounded-full bg-black/60 border border-white/10 hover:bg-white/10 hover:scale-110 backdrop-blur-2xl text-white/70 hover:text-white transition-all shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+          >
+            <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
+          </button>
+        </div>
+
+        {/* 3D Continuous Rotating Cylinder Ring */}
+        <motion.div 
+          className="relative w-full h-full flex items-center justify-center" 
+          animate={{ rotateY: rotationAngle, z: -radius }}
+          transition={{ type: "spring", stiffness: 100, damping: 20, mass: 1 }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {services.map((svc, i) => {
+            // Check to find angular distance from the front (camera facing). 
+            // The active card sits directly at 0deg relative to camera.
+            const currentGlobalRotation = (i * anglePerCard) + rotationAngle; 
+            // Normalize it perfectly to [-180, 180] bound gap logic to identify the exact front card mathematically
+            let normalizedRelativeRotation = currentGlobalRotation % 360;
+            if (normalizedRelativeRotation > 180) normalizedRelativeRotation -= 360;
+            if (normalizedRelativeRotation < -180) normalizedRelativeRotation += 360;
+            
+            const distFromFront = Math.abs(normalizedRelativeRotation);
+            
+            // If the card is completely rotated to the back (e.g. > 100 degrees), hide opacity so you don't click it by accident
+            const isFront = distFromFront < 1; // Tolerance for float precision
+            const isVisible = distFromFront < 100;
+
+            return (
+              <div
+                key={i}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] md:w-[400px] touch-none"
+                style={{ 
+                  transform: `rotateY(${i * anglePerCard}deg) translateZ(${radius}px)`,
+                  // Calculate dynamic backface darkness / opacity based on depth
+                  opacity: isVisible ? 1 - (distFromFront / 120) * 0.5 : 0, 
+                  pointerEvents: isVisible ? 'auto' : 'none',
+                  filter: isFront ? "none" : `brightness(${1 - (distFromFront / 120) * 0.4}) grayscale(${distFromFront / 180})`,
+                  transition: 'opacity 0.6s ease, filter 0.6s ease'
+                }}
+              >
+                {/* Prevent clicks on background cards from firing the "Open Demo", instead route the click to rotate them to the front */}
+                <div 
+                  className={`w-full h-full transition-transform duration-300 ${!isFront ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+                  onClick={() => {
+                     // If user clicks a card not currently in the front, rotate the entire wheel to bring it to front
+                     if (!isFront) {
+                       // Find shortest rotation
+                       let diff = (i * anglePerCard) + rotationAngle;
+                       diff = diff % 360;
+                       if (diff > 180) diff -= 360;
+                       if (diff < -180) diff += 360;
+                       setRotationAngle(r => r - diff);
+                     } else {
+                        // Fully interactable / open modal
+                        setOpenIdx(i);
+                     }
+                  }}
+                >
+                  <ServicePanel
+                    {...svc}
+                    onOpen={() => { if (isFront) setOpenIdx(i); }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </motion.div>
+
+        {/* Dynamic Interactive Dot Navigation */}
+        <div className="absolute bottom-[-20px] md:bottom-2 left-1/2 -translate-x-1/2 flex gap-3 z-50">
+          {services.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                 let diff = (i * anglePerCard) + rotationAngle;
+                 diff = diff % 360;
+                 if (diff > 180) diff -= 360;
+                 if (diff < -180) diff += 360;
+                 setRotationAngle(r => r - diff);
+              }}
+              className="w-2.5 h-2.5 rounded-full transition-all duration-500"
+              style={{
+                backgroundColor: i === normalizedActiveIndex ? services[i].color : 'rgba(255,255,255,0.2)',
+                transform: i === normalizedActiveIndex ? 'scale(1.5)' : 'scale(1)',
+                boxShadow: i === normalizedActiveIndex ? `0 0 10px ${services[i].color}` : 'none',
+              }}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Video Modal */}
+      {/* Video Modal containing the live 24/7 demo */}
       <AnimatePresence>
         {openIdx !== null && (
           <VideoModal
