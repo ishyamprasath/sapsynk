@@ -77,7 +77,7 @@ export default function BeforeAfterSlider() {
           onTouchStart={onTouchStart}
         >
         <img
-          src="public\automated.jpg"
+          src="/automated.jpg"
           alt="Manual workflow chaos"
           className="absolute inset-0 h-full w-full object-cover"
           draggable={false}
@@ -88,7 +88,7 @@ export default function BeforeAfterSlider() {
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         >
           <img
-            src="public\Chaos.jpg"
+            src="/Chaos.jpg"
             alt="Automated workflow"
             className="absolute inset-0 h-full w-full object-cover"
             draggable={false}
