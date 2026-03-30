@@ -7,21 +7,6 @@ import {
   RxLinkedinLogo,
 } from "react-icons/rx";
 
-export const SKILL_DATA = [
-  {
-    skill_name: "Python",
-    image: "python.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "FastAPI",
-    image: "fastapi.png",
-    width: 80,
-    height: 80,
-  },
-] as const;
-
 export const SOCIALS = [
   {
     name: "Instagram",
@@ -38,153 +23,6 @@ export const SOCIALS = [
     icon: RxTwitterLogo,
     link: "https://x.com/_sanidhyy",
   },
-] as const;
-
-export const FRONTEND_SKILL = [
-  {
-    skill_name: "JavaScript",
-    image: "js.png",
-    width: 65,
-    height: 65,
-  },
-  {
-    skill_name: "React",
-    image: "react.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "Node.js",
-    image: "node.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "REST API",
-    image: "rest.png",
-    width: 80,
-    height: 80,
-  },
-] as const;
-
-export const BACKEND_SKILL = [
-  {
-    skill_name: "PostgreSQL",
-    image: "postgresql.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "MongoDB",
-    image: "mongodb.png",
-    width: 40,
-    height: 40,
-  },
-  
-  {
-    skill_name: "TensorFlow",
-    image: "tensorflow.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "PyTorch",
-    image: "pytorch.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "OpenAI API",
-    image: "openai.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "LangChain",
-    image: "langchain.png",
-    width: 80,
-    height: 80,
-  },
-  {
-    skill_name: "Apache Kafka",
-    image: "kafka.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "GraphQL",
-    image: "graphql.png",
-    width: 80,
-    height: 80,
-  },
-] as const;
-
-export const FULLSTACK_SKILL = [
-  {
-    skill_name: "n8n",
-    image: "n8n.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Zapier",
-    image: "zapier.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Apache Airflow",
-    image: "airflow.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "AWS",
-    image: "aws.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Power BI",
-    image: "powerbi.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Google Vision API",
-    image: "googlevision.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Mailgun",
-    image: "mailgun.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Tableau",
-    image: "tableau.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "Twilio Voice API",
-    image: "twilio.png",
-    width: 70,
-    height: 70,
-  },
-  {
-    skill_name: "AWS Textract",
-    image: "awstextract.png",
-    width: 70,
-    height: 70,
-  },
-] as const;
-
-export const OTHER_SKILL = [
-  
-  
 ] as const;
 
 export const PROJECTS = [
@@ -282,10 +120,6 @@ export const NAV_LINKS = [
   {
     title: "Workflow",
     link: "#workflow",
-  },
-  {
-    title: "Team",
-    link: "#team",
   },
   {
     title: "Contact",

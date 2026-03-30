@@ -15,7 +15,6 @@ export default function Footer() {
         {/* Links */}
         <div className="flex gap-8 text-sm text-[#F5F0E8]/40">
           <a href="#services" className="hover:text-[#b49bff] transition-colors">Services</a>
-          <a href="#team" className="hover:text-[#b49bff] transition-colors">Team</a>
           <a href="#contact" className="hover:text-[#b49bff] transition-colors">Contact</a>
         </div>
 

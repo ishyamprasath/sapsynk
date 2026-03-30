@@ -7,13 +7,11 @@ import { Navbar } from './components/main/navbar';
 import { Footer } from './components/main/footer';
 import { Hero } from './components/main/hero';
 import { StarsCanvas } from './components/main/star-background';
-import { Skills } from './components/main/skills';
 import Ribbons from './components/main/Ribbons';
 import BeforeAfterSlider from './components/BeforeAfterSlider';
 import WorkflowBuilder from './components/WorkflowBuilder';
 import Services from './components/Services/Services';
 import ROITicker from './components/ROITicker';
-import Team from './components/Team';
 import { Contact } from './components/Contact/Contact';
 
 // ─── Scroll Progress Bar ──────────────────────────────────────────────────────
@@ -159,12 +157,10 @@ export default function App() {
 
       <main className="relative z-10">
         <Hero />
-        <Skills />
         <BeforeAfterSlider />
         <WorkflowBuilder />
         <Services />
         <ROITicker />
-        <Team />
         <Contact />
         <CTASection />
       </main>
